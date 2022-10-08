@@ -64,7 +64,6 @@ def co2_rating(diag_input):
         else:
             diag_input = [diag_input[i]
                           for i in range(len(diag_input)) if d[i] == 0]
-        print(diag_input)
         if len(diag_input) == 1:
             break
     rating = int(diag_input[0], base=2)
