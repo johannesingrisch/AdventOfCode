@@ -1,109 +1,43 @@
 # Day 4
 
-from calendar import c
-from shutil import which
+# Part 1 -------
+
+import numpy as np
+import Scripts.funs_04 as f
+from Scripts.class_04 import board
 
 
 input_test = 'Data/04_test.txt'
+input_full = 'Data/04_full.txt'
 
-fn = input_test
+fn = input_full
 
-with open(fn, 'r') as f:
-    data = [el.strip() for el in f.readlines()]
+# read called numbers
+called = f.read_called(fn)
 
-data
+# read the bingo boards
+boarddata = f.edit_boards(fn)
 
-# extract the called numbers
-called = [int(el) for el in data[0].split(sep=",")]
-called
-
-# extract the different boards
-boards = data[2:]
-
-boards[5]
-
-not boards[5]
-
-''.join(boards).split()
+# transform to class 'board'
+all_boards = [board(np.array(el).astype(int)) for el in boarddata]
 
 
-# extract board data and store in nested list
+# Playing the game ++++++
 
-boards_nested = []
-board_intermediate = []
-for el in range(0, len(boards)):
-    if len(boards[el]) != 0 and el != len(boards):
-        board_intermediate.append(boards[el])
-    elif el == len(boards):
-        board_intermediate.append(boards[el])
-        boards_nested.append(board_intermediate)
-    else:
-        boards_nested.append(board_intermediate)
-        board_intermediate = []
-
-for ind in range(0, len(boards_nested)):
-    boards_nested[ind] = [el.split() for el in boards_nested[ind]]
-
-
-#board1 = [el.split() for el in board1]
-
-# erstelle aus den baord reihen die board spalten als liste
-def vert_lists(mylist):
-    out = []
-    for i in range(0, len(mylist[0])):
-        out.append([el[i] for el in mylist])
-    return out
-
-# erstelle die board-diagonalen
-
-
-def diag_lists(mylist):
-    diag1 = [mylist[ind][ind] for ind in range(0, len(mylist[0]))]
-    diag2 = [mylist[::-1][ind][ind] for ind in range(0, len(mylist[0]))]
-    return [diag1, diag2]
-
-
-boards_vert = []
-
-vert_lists(boards_nested[0])
-
-boards_vert = [vert_lists(el) for el in boards_nested]
-boards_diag = [diag_lists(el) for el in boards_nested]
-
-#board1_vert = vert_lists(board1)
-#board1_diag = diag_lists(board1)
-
-board1.extend(board1_vert)
-board1.extend(board1_diag)
-
-# combine to one list with all winning options
-for i in range(0, len(boards_nested)):
-    boards_nested[i].extend(boards_vert[i])
-    boards_nested[i].extend(boards_diag[i])
-    print(f"number of win-combis: {len(boards_nested[i])}")
-    print(" ------ ")
-
-boards_int = [[[int(el) for el in sublist] for sublist in allboards]
-              for allboards in boards_nested]
-
-# Start the game
-sub = boards_int[0][0]
-
-call = called[0]
-
-# remove element with value 17 from list sub
-sub.pop(sub.index(17))
-
-# initiate list, where matches per row are counted, all starting with zero
-wins = [[[0 for el in sublist] for sublist in allboards]
-        for allboards in boards_nested]
-
-# for each match in a list, add 1 to wins
-# ++ funktioniert noch nicht, weil ich nicht win und boards_nested kombinieren muss
-# ++ move on here
-
-[[[el + 1 for el in sublist if call in sublist]
-    for sublist in allboards] for allboards in boards_nested]
-
-
-#
+winner = 0
+round = 0
+while winner == 0:
+    called_number = called[round]
+    print(f"Round {round + 1} of the game")
+    print(f"We draw number {called_number}")
+    for i in range(0, len(all_boards)):
+        all_boards[i].call_match(called_number)
+        all_boards[i].win_value()
+        if all_boards[i].win == True:
+            winner += 1
+            print(f"We have a winner! It is board #{i}")
+            all_boards[i].undrawn_sum()
+            winsum = all_boards[i].sum
+            winval = winsum * called_number
+            print(f"The win value is {winval}")
+    round += 1
